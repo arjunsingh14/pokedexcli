@@ -2,22 +2,21 @@ package main
 
 import (
 	"fmt"
-	"github.com/arjunsingh14/pokedexcli/internals"
 )
 
 
 func commandMapb(cfg *config) error {
-	if cfg.previous == "" {
+	if *cfg.previousLocationsUrl == "" {
 		fmt.Println("You're on the first page")
 		return nil
 	}
-	locationArea, err := internals.GetLocationAreas(cfg.previous)
+	locationArea, err := cfg.client.GetLocationAreas(cfg.previousLocationsUrl)
 	if err != nil {
 		return err
 	}
 
-	cfg.next = locationArea.Next
-	cfg.previous = locationArea.Previous
+	cfg.nextLocationsUrl = locationArea.Next
+	cfg.previousLocationsUrl = locationArea.Previous
 
 	for _, result := range locationArea.Results{
 		fmt.Println(result.Name)

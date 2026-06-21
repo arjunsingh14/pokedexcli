@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"github.com/arjunsingh14/pokedexcli/internal/pokeapi"
 )
 
 type cliCommand struct {
@@ -14,8 +15,9 @@ type cliCommand struct {
 }
 
 type config struct {
-	next string
-	previous string
+	client pokeapi.Client
+	nextLocationsUrl *string
+	previousLocationsUrl *string
 }
 
 func getCommands() map[string]cliCommand {
@@ -43,8 +45,7 @@ func getCommands() map[string]cliCommand {
 	}
 }
 
-func startRepl() {
-	cfg := config{next: "https://pokeapi.co/api/v2/location-area/", previous: ""}
+func startRepl(cfg *config) {
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
 		fmt.Print("pokedex > ")
@@ -55,13 +56,19 @@ func startRepl() {
 		if len(input) == 0 {
 			continue
 		}
-		val, ok := getCommands()[input[0]]
+		commandName := input[0]
+		val, ok := getCommands()[commandName]
 
 		if !ok {
 			fmt.Println("Unknown command")
 			continue
 		}
-		val.callback(&cfg)
+
+		err := val.callback(cfg)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
 	}
 
 
