@@ -3,51 +3,56 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"github.com/arjunsingh14/pokedexcli/internal/pokeapi"
 	"os"
 	"strings"
-	"github.com/arjunsingh14/pokedexcli/internal/pokeapi"
 )
 
 type cliCommand struct {
-	name string
+	name        string
 	description string
-	callback func(*config, ...string) error
+	callback    func(*config, ...string) error
 }
 
 type config struct {
-	client pokeapi.Client
-	nextLocationsUrl *string
+	client               pokeapi.Client
+	nextLocationsUrl     *string
 	previousLocationsUrl *string
+	pokedex map[string]pokeapi.Pokemon
 }
 
 func getCommands() map[string]cliCommand {
 	return map[string]cliCommand{
-    	"exit": {
-        	name:        "exit",
-        	description: "Exit the Pokedex",
-        	callback:    commandExit,
-    	},
+		"exit": {
+			name:        "exit",
+			description: "Exit the Pokedex",
+			callback:    commandExit,
+		},
 		"help": {
-			name: "help",
+			name:        "help",
 			description: "Display a help message",
-			callback: commandHelp,
+			callback:    commandHelp,
 		},
 		"map": {
-			name: "map",
+			name:        "map",
 			description: "Lists location areas",
-			callback: commandMap,
+			callback:    commandMap,
 		},
 		"mapb": {
-			name: "mapb",
+			name:        "mapb",
 			description: "Lists previous locations",
-			callback: commandMapb,
+			callback:    commandMapb,
 		},
 		"explore": {
-			name: "explore",
+			name:        "explore",
 			description: "Lists pokemon in an area",
-			callback: commandExplore,
+			callback:    commandExplore,
 		},
-		 
+		"catch": {
+			name:        "catch",
+			description: "Catch a Pokemon",
+			callback:    commandCatch,
+		},
 	}
 }
 
@@ -76,7 +81,6 @@ func startRepl(cfg *config) {
 			continue
 		}
 	}
-
 
 	if err := scanner.Err(); err != nil {
 		fmt.Println("error reading input:", err)

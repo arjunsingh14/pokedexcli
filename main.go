@@ -5,11 +5,11 @@ import (
 	"time"
 )
 
-
 func main() {
 	client := pokeapi.NewClient(5 * time.Second)
 	cfg := &config{
 		client: client,
+		pokedex: make(map[string]pokeapi.Pokemon),
 	}
 	startRepl(cfg)
 }
