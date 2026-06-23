@@ -11,13 +11,13 @@ type cacheEntry struct {
 }
 
 type Cache struct {
-	Entries map[string]cacheEntry
+	entries map[string]cacheEntry
 	mu    sync.Mutex
 }
 
 func NewCache(interval time.Duration) *Cache {
 	newCache := &Cache{
-		Entries: make(map[string]cacheEntry),
+		entries: make(map[string]cacheEntry),
 	}
 
 	go newCache.reapLoop(interval)
@@ -29,13 +29,13 @@ func (c *Cache) Add(key string, val []byte) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	newCacheEntry := cacheEntry{createdAt: time.Now(), val: val}
-	c.Entries[key] = newCacheEntry
+	c.entries[key] = newCacheEntry
 }
 
 func (c *Cache) Get(key string) ([]byte, bool) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	cacheEntry, exists := c.Entries[key]
+	cacheEntry, exists := c.entries[key]
 	if !exists {
 		return []byte{}, false
 	}
@@ -46,9 +46,9 @@ func (c *Cache) reapLoop(interval time.Duration) {
 	ticker := time.NewTicker(interval)
 	for range ticker.C {
 		c.mu.Lock()
-		for key, entry := range c.Entries {
+		for key, entry := range c.entries {
 			if time.Since(entry.createdAt) > interval {
-				delete(c.Entries, key)
+				delete(c.entries, key)
 			}
 		}
 		c.mu.Unlock()

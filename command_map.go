@@ -6,7 +6,7 @@ import (
 
 
 
-func commandMap(cfg *config) error {
+func commandMap(cfg *config, _ ...string) error {
 	locationArea, err := cfg.client.GetLocationAreas(cfg.nextLocationsUrl)
 	if err != nil {
 		return err
